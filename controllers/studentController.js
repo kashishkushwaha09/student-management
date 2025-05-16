@@ -1,4 +1,6 @@
 const db=require('../utils/db-connection');
+const Student=require('../models/studentModel');
+
 // Retrieve all users from the database.
 const retrieveEntries=(req,res)=>{
     const readQuery=`SELECT * FROM students`;
@@ -13,19 +15,18 @@ const retrieveEntries=(req,res)=>{
     })
 }
 // Add a new user.
-const addEntries=(req,res)=>{
-const {email,name,age}=req.body;
-const InsertQuery=`INSERT INTO students (name,email,age) VALUES (?,?,?)`;
-db.execute(InsertQuery,[name,email,age],(err)=>{
-    if(err){
-        console.log(err.message);
-        res.status(500).send(err.message);
-        db.end();
-        return;
+const addEntries=async (req,res)=>{
+    try {
+     const {email,name,age}=req.body;
+     const student=await Student.create({
+        name,email,age
+     }) 
+     res.status(201).send(`student with name ${name} successfully created`);
+    } catch (error) {
+         res.status(500).send("Server error:-unable to make an entry");
+        console.log(error);
     }
-    console.log("value has been inserted");
-    res.status(200).send(`student with name ${name} successfully added`);
-})
+
 }
 const updateEntries=(req,res)=>{
     const {id}=req.params;
