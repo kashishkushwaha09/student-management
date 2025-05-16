@@ -2,7 +2,8 @@ const express= require('express');
 const app=express();
 const db=require('./utils/db-connection');
 const studentRouter=require('./routes/studentRoutes');
-const studentsModel=require('./models/studentModel')
+// const studentsModel=require('./models/studentModel')
+require('./models');
 app.use(express.json());
 app.use('/api/students',studentRouter);
 db.sync({alter:true}).then(()=>{
