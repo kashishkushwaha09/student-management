@@ -23,32 +23,46 @@ const addEntries=async (req,res)=>{
      }) 
      res.status(201).send(`student with name ${name} successfully created`);
     } catch (error) {
-         res.status(500).send("Server error:-unable to make an entry");
         console.log(error);
+         res.status(500).send("Server error:-unable to make an entry");
+        
     }
 
 }
-const updateEntries=(req,res)=>{
+const updateEntries=async (req,res)=>{
+ try {
     const {id}=req.params;
     const {name,email}=req.body;
-    let updateQuery,fields;
-    if(name && email){
-    updateQuery=`UPDATE students set name=?,email=? WHERE id=?`;
-     fields=[name,email,id];
+    const student=await Student.findByPk(id);
+    if(!student){
+        res.status(404).send("student not found");
     }
-    db.execute(updateQuery,fields,(err,result)=>{
-        if(err){
-            console.log(err.message);
+    student.name=name;
+    await student.save();
+    res.status(200).send("student has been updated");
+ } catch (error) {
+             console.log(err);
         res.status(500).send(err.message);
-        db.end();
-        return;
-        }
-        if(result.affectedRows===0){
-            res.status(404).send("student not found");
-            return;
-        }
-        res.status(200).send("student has been updated");
-    })
+ }
+    
+    // let updateQuery,fields;
+    // if(name && email){
+    // updateQuery=`UPDATE students set name=?,email=? WHERE id=?`;
+    //  fields=[name,email,id];
+    // }
+    // db.execute(updateQuery,fields,(err,result)=>{
+    //     if(err){
+    //         console.log(err.message);
+    //     res.status(500).send(err.message);
+    //     db.end();
+    //     return;
+    //     }
+    //     if(result.affectedRows===0){
+    //         res.status(404).send("student not found");
+    //         return;
+    //     }
+    //     res.status(200).send("student has been updated");
+    // })
 }
 const deleteEntry=(req,res)=>{
     const {id}=req.params;
