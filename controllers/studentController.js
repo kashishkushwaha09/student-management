@@ -1,6 +1,7 @@
 const db=require('../utils/db-connection');
 const Student=require('../models/studentModel');
-
+const IdentityCard=require('../models/identityCardModel');
+const Department=require('../models/departmentModel');
 // Retrieve all users from the database.
 const retrieveEntries=(req,res)=>{
     const readQuery=`SELECT * FROM students`;
@@ -17,9 +18,9 @@ const retrieveEntries=(req,res)=>{
 // Add a new user.
 const addEntries=async (req,res)=>{
     try {
-     const {email,name,age}=req.body;
+     const {email,name,age,departmentId}=req.body;
      const student=await Student.create({
-        name,email,age
+        name,email,age,DepartmentId:departmentId
      }) 
      res.status(201).send(`student with name ${name} successfully created`);
     } catch (error) {
@@ -28,6 +29,35 @@ const addEntries=async (req,res)=>{
         
     }
 
+}
+const addDepartment=async (req,res)=>{
+    try {
+     const {name}=req.body;
+     const department=await Department.create({
+        name
+     }) 
+     res.status(201).send(`department with name ${name} successfully created`);
+    } catch (error) {
+        console.log(error);
+         res.status(500).send("Server error:-unable to make an entry");
+        
+    }
+
+}
+const addingValuesToStudentAndIdentityCardTable=async (req,res)=>{
+    try {
+        
+        const student=await Student.create(req.body.student);
+        const identityCard=await IdentityCard.create({
+           ...req.body.identityCard,
+            StudentId:student.id
+        })
+        res.status(201).json({student,identityCard});
+    } catch (error) {
+        console.log(error);
+         res.status(500).send("Server error:-unable to make an entry");
+        
+    }
 }
 const updateEntries=async (req,res)=>{
  try {
@@ -66,4 +96,4 @@ const deleteEntry=async (req,res)=>{
    
 }
 
-module.exports={retrieveEntries,addEntries,updateEntries,deleteEntry};
+module.exports={retrieveEntries,addEntries,updateEntries,deleteEntry,addingValuesToStudentAndIdentityCardTable,addDepartment};
